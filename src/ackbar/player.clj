@@ -1,6 +1,6 @@
-(ns lean-poker.player)
+(ns ackbar.player)
 
-(def version "Clojure-y folding player")
+(def version "Admiral Ackbar lives!")
 
 (defn bet-request
   [game-state]

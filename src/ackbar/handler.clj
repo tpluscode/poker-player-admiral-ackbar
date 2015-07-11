@@ -1,15 +1,14 @@
-(ns lean-poker.core
-  (:gen-class)
-  (:require [clojure.data.json :as json]
-            [lean-poker.player :as player]
-            [ring.middleware.params :refer [wrap-params]]
-            [ring.adapter.jetty :refer [run-jetty]]
-            [taoensso.timbre :as log]))
+(ns ackbar.handler
+  (:require
+   [ackbar.player :as player]
+   [ring.middleware.params :refer [wrap-params]]
+   [clj-json.core :as json]
+   [taoensso.timbre :as log]))
 
 (defn game-state [req]
   (try
     (-> (get-in req [:params "game_state"])
-        (json/read-str :key-fn keyword))
+        (json/parse-string true))
     (catch Exception ex
       (log/error "Bad JSON" ex)
       {})))
@@ -37,10 +36,16 @@
        :headers {"Content-Type" "text/html"}
        :body    (str player/version)})
 
+    "check"
+    (do
+      (log/info "Check" player/version)
+      {:status  200
+       :headers {"Content-Type" "text/html"}
+       :body    ""})
+
     (do
       (log/warn "Bad request" req)
       {:status 400})))
 
-(defn -main [& [port]]
-  (let [port (Integer. (or port 8087))]
-    (run-jetty (wrap-params handler) {:port port})))
+(def app
+  (wrap-params handler))
