@@ -75,16 +75,19 @@
     (log/info "[a, b]: [%s %s]" a b)
     (cond
       (and (#{:straight-flush} naive-hand-type)
+           (not= naive-hand-type :flop)
            (not= naive-hand-type community-hand-type))
       (log/spy :info :straight-flush-all-in all-in)
 
       (and (#{:four-of-a-kind} naive-hand-type)
+           (not= naive-hand-type :flop)
            (= a b)
            (not= naive-hand-type community-hand-type))
       (log/spy :info :four-of-a-kind-all-in all-in)
 
       (and (#{:straight-flush :four-of-a-kind :full-house :three-of-a-kind}
             naive-hand-type)
+           (not= naive-hand-type :flop)
            (not= naive-hand-type community-hand-type))
       (log/spy :info :good-large-bet large-bet)
 
