@@ -87,10 +87,9 @@
         stack (max (:stack p) 500)
         bet (+ value (:bet p))
         limit (/ stack ratio)]
-    bet))
-    ; (if (and (> bet limit) (or (< (:round state) 40) (> (count (:players state)) 3)))
-    ;   0
-    ;   bet)))
+    (if (and (> bet limit) (or (< (:round state) 40) (> (count (:players state)) 3)))
+      limit
+      bet)))
 
 (defn bet-request
   [game-state]
@@ -136,10 +135,10 @@
       (log/spy :info :flop-small-bet (capped check-bet game-state 4))
 
       (and (= hand-type :flop) (> (:bet player) 0) (< check-bet (/ (:stack player) 2)))
-      (log/spy :info :flop-just-checking check-bet)
+      (log/spy :info :flop-just-checking (capped check-bet game-state 2))
 
       (and (> (:bet player) 0))
-      (log/spy :info :always-checking large-bet)
+      (log/spy :info :always-checking (capped large-bet game-state 2))
 
       :else (log/spy :info :fold 0))))
 
