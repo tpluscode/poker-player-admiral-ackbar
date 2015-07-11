@@ -94,10 +94,10 @@
       ;(and (#{:flush :straight :two-pair :pair} super-naive-hand-type)
       (and (not= :flop super-naive-hand-type)
            (not= naive-hand-type community-hand-type))
-      (log/spy :info :kinda-small-bet small-bet)
+      (log/spy :info :kinda-small-bet check-bet)
 
       (and (> a 9) (> b 9) (= naive-hand-type :flop))
-      (log/spy :info :flop-large-bet small-bet)
+      (log/spy :info :flop-large-bet check-bet)
 
       (and (or (> a 9) (> b 9)) (= naive-hand-type :flop))
       (log/spy :info :flop-small-bet check-bet)
