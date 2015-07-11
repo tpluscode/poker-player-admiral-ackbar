@@ -51,6 +51,12 @@
         min-raise (:minimum_raise state)]
     (- current-buy-in current-bet (- min-raise))))
 
+(defn check [state]
+  (let [admiral (admiral state)
+        current-buy-in (:current_buy_in state)
+        current-bet (:bet admiral)]
+    (- current-buy-in current-bet)))
+
 (defn all-in [state]
   (:stack (admiral state)))
 
@@ -60,6 +66,7 @@
   (let [[a b] (map :rank (hole-cards game-state))
         small-bet (small-raise game-state)
         large-bet (* 2 small-bet)
+        check-bet (check state)
         naive-hand-type (eval-hand (take 5 (concat (hole-cards game-state)
                                                    (community-cards game-state))))
         super-naive-hand-type (eval-hand (concat (hole-cards game-state)
@@ -77,10 +84,10 @@
       (log/spy :info :kinda-small-bet small-bet)
 
       (and (> a 9) (> b 9) (= naive-hand-type :flop))
-      (log/spy :info :flop-large-bet large-bet)
+      (log/spy :info :flop-large-bet small-bet)
 
       (or (> a 9) (> b 9) (= naive-hand-type :flop))
-      (log/spy :info :flop-small-bet small-bet)
+      (log/spy :info :flop-small-bet check-bet)
 
       (or (= a b) (= naive-hand-type :flop))
       (log/spy :info :flop-small-pair small-bet)
