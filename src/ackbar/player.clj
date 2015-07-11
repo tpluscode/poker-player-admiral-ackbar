@@ -33,9 +33,11 @@
   [game-state]
   (log/info (pr-str game-state))
   (let [[a b] (hole-cards game-state)
-        bet (small-raise game-state)]
-    (if (and (> a 9) (> b 9))
-      bet
+        small-bet (small-raise game-state)
+        large-bet (* 2 small-bet)]
+    (cond
+      (and (> a 9) (> b 9)) large-bet
+      (or (> a 9) (> b 9)) small-bet
       0)))
 
 (defn showdown
