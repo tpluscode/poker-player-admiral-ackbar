@@ -137,7 +137,7 @@
       (and (= hand-type :flop) (> (:bet player) 0) (< check-bet (/ (:stack player) 2)))
       (log/spy :info :flop-just-checking (capped check-bet game-state 2))
 
-      (and (> (:bet player) 0))
+      (and (not= hand-type :flop) (> (:bet player) 0))
       (log/spy :info :always-checking (capped large-bet game-state 2))
 
       :else (log/spy :info :fold 0))))
