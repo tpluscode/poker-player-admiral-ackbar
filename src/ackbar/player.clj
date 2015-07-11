@@ -74,10 +74,19 @@
         community-hand-type (eval-hand (community-cards game-state))]
     (log/info "[a, b]: [%s %s]" a b)
     (cond
+      (and (#{:straight-flush} naive-hand-type)
+           (not= naive-hand-type community-hand-type))
+      (log/spy :info :straight-flush-all-in all-in)
+
+      (and (#{:four-of-a-kind} naive-hand-type)
+           (= a b)
+           (not= naive-hand-type community-hand-type))
+      (log/spy :info :four-of-a-kind-all-in all-in)
+
       (and (#{:straight-flush :four-of-a-kind :full-house :three-of-a-kind}
             naive-hand-type)
            (not= naive-hand-type community-hand-type))
-      (log/spy :info :all-in all-in)
+      (log/spy :info :good-large-bet large-bet)
 
       ;(and (#{:flush :straight :two-pair :pair} super-naive-hand-type)
       (and (not= :flop super-naive-hand-type)
