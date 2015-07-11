@@ -60,12 +60,22 @@
 (defn all-in [state]
   (:stack (admiral state)))
 
+(defn capped [value state]
+  (let [p (admiral state)
+        stack (max (:stack p) 500)
+        bet (+ value (:bet p))
+        limit (/ stack 2)]
+    (if (> bet limit)
+      0
+      bet)))
+
+
 (defn bet-request
   [game-state]
   (log/info (pr-str game-state))
   (let [[a b] (map :rank (hole-cards game-state))
-        small-bet (small-raise game-state)
-        large-bet (* 2 small-bet)
+        small-bet (capped (small-raise game-state) game-state)
+        large-bet (capped (* 2 small-bet) game-state)
         check-bet (check game-state)
         naive-hand-type (eval-hand (take 5 (concat (hole-cards game-state)
                                                    (community-cards game-state))))
