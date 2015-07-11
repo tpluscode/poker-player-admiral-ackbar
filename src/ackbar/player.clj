@@ -62,6 +62,8 @@
         large-bet (* 2 small-bet)
         naive-hand-type (eval-hand (take 5 (concat (hole-cards game-state)
                                                    (community-cards game-state))))
+        super-naive-hand-type (eval-hand (concat (hole-cards game-state)
+                                                 (community-cards game-state)))
         community-hand-type (eval-hand (community-cards game-state))]
     (log/info "[a, b]: [%s %s]" a b)
     (cond
@@ -69,9 +71,20 @@
             naive-hand-type)
            (not= naive-hand-type community-hand-type))
       (log/spy :info :all-in all-in)
-      (and (> a 9) (> b 9)) (log/spy :info :large-bet large-bet)
-      (or (> a 9) (> b 9)) (log/spy :info :small-bet small-bet)
-      (or (= a b)) (log/spy :info :small-bet-pair small-bet)
+
+      (and (#{:flush :straight :two-pair :pair} super-naive-hand-type)
+           (not= naive-hand-type community-hand-type))
+      (log/spy :info :kinda-small-bet small-bet)
+
+      (and (> a 9) (> b 9) (= naive-hand-type :flop))
+      (log/spy :info :flop-large-bet large-bet)
+
+      (or (> a 9) (> b 9) (= naive-hand-type :flop))
+      (log/spy :info :flop-small-bet small-bet)
+
+      (or (= a b) (= naive-hand-type :flop))
+      (log/spy :info :flop-small-pair small-bet)
+
       :else (log/spy :info :fold 0))))
 
 (defn showdown
