@@ -7,7 +7,7 @@
 (defn bet-request
   [game-state]
   (log/info (pr-str game-state))
-  0)
+  (rand-int 100))
 
 (defn showdown
   [game-state]
