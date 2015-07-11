@@ -79,7 +79,8 @@
            (not= naive-hand-type community-hand-type))
       (log/spy :info :all-in all-in)
 
-      (and (#{:flush :straight :two-pair :pair} super-naive-hand-type)
+      ;(and (#{:flush :straight :two-pair :pair} super-naive-hand-type)
+      (and (not= :flop super-naive-hand-type)
            (not= naive-hand-type community-hand-type))
       (log/spy :info :kinda-small-bet small-bet)
 
