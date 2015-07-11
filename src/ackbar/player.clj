@@ -125,13 +125,13 @@
       (log/spy :info :kinda-small-bet check-bet)
 
       (and (> a 9) (> b 9) (= hand-type :flop))
-      (log/spy :info :flop-large-bet (capped check-bet game-state 4))
+      (log/spy :info :flop-large-bet (capped check-bet game-state 2))
 
       (and (or (> a 9) (> b 9)) (= hand-type :flop))
       (log/spy :info :flop-small-bet (capped check-bet game-state 4))
 
       (and (= a b) (= hand-type :flop))
-      (log/spy :info :flop-small-pair (capped check-bet game-state 4))
+      (log/spy :info :flop-small-pair (capped check-bet game-state 2))
 
       :else (log/spy :info :fold 0))))
 
