@@ -138,6 +138,9 @@
       (and (= hand-type :flop) (> (:bet player) 0) (< check-bet (/ (:stack player) 2)))
       (log/spy :info :flop-just-checking check-bet)
 
+      (and (> (:bet player) 0))
+      (log/spy :info :always-checking check-bet)
+
       :else (log/spy :info :fold 0))))
 
 (defn showdown
