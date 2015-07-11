@@ -82,11 +82,11 @@
 (defn all-in [state]
   (:stack (admiral state)))
 
-(defn capped [value state]
+(defn capped [value state ratio]
   (let [p (admiral state)
         stack (max (:stack p) 500)
         bet (+ value (:bet p))
-        limit (/ stack 2)]
+        limit (/ stack ratio)]
     (if (> bet limit)
       0
       bet)))
@@ -95,8 +95,8 @@
   [game-state]
   (log/info (pr-str game-state))
   (let [[a b] (map :rank (hole-cards game-state))
-        small-bet (capped (small-raise game-state) game-state)
-        large-bet (capped (* 2 small-bet) game-state)
+        small-bet (capped (small-raise game-state) game-state 2)
+        large-bet (capped (* 2 small-bet) game-state 2)
         check-bet (check game-state)
         hand-type (eval-7-hand (concat (hole-cards game-state)
                                        (community-cards game-state)))
@@ -125,13 +125,13 @@
       (log/spy :info :kinda-small-bet check-bet)
 
       (and (> a 9) (> b 9) (= hand-type :flop))
-      (log/spy :info :flop-large-bet check-bet)
+      (log/spy :info :flop-large-bet (capped check-bet 4))
 
       (and (or (> a 9) (> b 9)) (= hand-type :flop))
-      (log/spy :info :flop-small-bet check-bet)
+      (log/spy :info :flop-small-bet (capped check-bet 4))
 
       (and (= a b) (= hand-type :flop))
-      (log/spy :info :flop-small-pair check-bet)
+      (log/spy :info :flop-small-pair (capped check-bet 4))
 
       :else (log/spy :info :fold 0))))
 
