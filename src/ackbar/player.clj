@@ -9,18 +9,40 @@
       (:players)
       (nth (:in_action state))))
 
+(defn make-card [{:keys [:rank :suit]}]
+  {:rank (case rank "A" 14 "K" 13 "Q" 12 "J" 11 (Integer/parseInt rank))
+   :suit suit})
+
+(defn eval-hand [hand]
+  (if (< (count hand) 5)
+    :flop
+    (let [hand (map (fn [hand] [(:suit hand) (:rank hand)]) hand)
+          ranks (map last hand)
+          flush (apply = (map first hand))
+          straight? #(= (sort %) (map (partial + (apply min %)) (range 5)))
+          straight (or (straight? ranks) (straight? (replace {12 -1} ranks)))
+          freq (sort (vals (frequencies ranks)))]
+      (cond
+        (and flush straight) :straight-flush
+        flush :flush
+        straight :straight
+        (= freq [1 4]) :four-of-a-kind
+        (= freq [2 3]) :full-house
+        (= freq [1 1 3]) :three-of-a-kind
+        (= freq [1 2 2]) :two-pair
+        (= freq [1 1 1 2]) :pair
+        :else :high-card))))
+
 (defn hole-cards [state]
   (let [p (admiral state)]
     (->> p
          (:hole_cards)
-         (map :rank)
-         (map (fn [c]
-                (case c
-                   "A" 14
-                   "K" 13
-                   "Q" 12
-                   "J" 11
-                   (Integer/parseInt c)))))))
+         (map make-card))))
+
+(defn community-cards [state]
+  (->> state
+       :community_cards
+       (map make-card)))
 
 (defn small-raise [state]
   (let [admiral (admiral state)
@@ -29,14 +51,24 @@
         min-raise (:minimum_raise state)]
     (- current-buy-in current-bet (- min-raise))))
 
+(defn all-in [state]
+  (:stack (admiral state)))
+
 (defn bet-request
   [game-state]
   (log/info (pr-str game-state))
-  (let [[a b] (hole-cards game-state)
+  (let [[a b] (map :rank (hole-cards game-state))
         small-bet (small-raise game-state)
-        large-bet (* 2 small-bet)]
+        large-bet (* 2 small-bet)
+        naive-hand-type (eval-hand (take 5 (concat (hole-cards game-state)
+                                                   (community-cards game-state))))
+        community-hand-type (eval-hand (community-cards game-state))]
     (log/info "[a, b]: [%s %s]" a b)
     (cond
+      (and (#{:straight-flush :four-of-a-kind :full-house :three-of-a-kind}
+            naive-hand-type)
+           (not= naive-hand-type community-hand-type))
+      (log/spy :info :all-in all-in)
       (and (> a 9) (> b 9)) (log/spy :info :large-bet large-bet)
       (or (> a 9) (> b 9)) (log/spy :info :small-bet small-bet)
       (or (= a b)) (log/spy :info :small-bet-pair small-bet)
@@ -46,26 +78,3 @@
   [game-state]
   nil)
 
-
-
-; (defn make-card [[s r]]
-;   {:suit ({\D :diamond \H :heart \C :club \S :spade} s)
-;    :rank (.indexOf (seq "23456789TJQKA") r)})
-
-; (defn eval-hand [hand]
-;     (let [hand (map (fn [[s r]] [s (.indexOf (seq "23456789TJQKA") r)]) hand)
-;           ranks (map last hand)
-;           flush (apply = (map first hand))
-;           straight? #(= (sort %) (map (partial + (apply min %)) (range 5)))
-;           straight (or (straight? ranks) (straight? (replace {12 -1} ranks)))
-;           freq (sort (vals (frequencies ranks)))]
-;       (cond
-;         (and flush straight) :straight-flush
-;         flush :flush
-;         straight :straight
-;         (= freq [1 4]) :four-of-a-kind
-;         (= freq [2 3]) :full-house
-;         (= freq [1 1 3]) :three-of-a-kind
-;         (= freq [1 2 2]) :two-pair
-;         (= freq [1 1 1 2]) :pair
-;         :else :high-card)))
