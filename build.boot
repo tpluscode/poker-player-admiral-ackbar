@@ -9,6 +9,7 @@
    [org.clojure/core.match      "0.3.0-alpha4"]
    [org.clojure/core.incubator  "0.1.3"]
    [org.clojure/data.generators "0.1.2"]
+   [org.clojure/math.combinatorics "0.1.1"]
 
    [environ                     "1.0.0"]
    [danielsz/boot-environ       "0.0.4"]

@@ -1,5 +1,6 @@
 (ns ackbar.player
   (:require
+   [clojure.math.combinatorics :as combo]
    [taoensso.timbre :as log]))
 
 (def version "Admiral Ackbar lives!")
@@ -32,6 +33,27 @@
         (= freq [1 2 2]) :two-pair
         (= freq [1 1 1 2]) :pair
         :else :high-card))))
+
+(def hand-ranks
+  {:straight-flush 10
+   :four-of-a-kind 9
+   :full-house 8
+   :flush 7
+   :straight 6
+   :three-of-a-kind 5
+   :two-pair 4
+   :pair 3
+   :high-card 2
+   :flop 1})
+
+(defn eval-7-hand [hand]
+  (->> (combo/combinations hand 5)
+       (map eval-hand)
+       (map (fn [x] [(hand-ranks x) x]))
+       (concat [[-1 :flop]])
+       (sort)
+       (last)
+       (last)))
 
 (defn hole-cards [state]
   (let [p (admiral state)]
@@ -76,42 +98,39 @@
         small-bet (capped (small-raise game-state) game-state)
         large-bet (capped (* 2 small-bet) game-state)
         check-bet (check game-state)
-        naive-hand-type (eval-hand (take 5 (concat (hole-cards game-state)
-                                                   (community-cards game-state))))
-        super-naive-hand-type (eval-hand (concat (hole-cards game-state)
-                                                 (community-cards game-state)))
+        hand-type (eval-7-hand (concat (hole-cards game-state)
+                                       (community-cards game-state)))
         community-hand-type (eval-hand (community-cards game-state))]
     (log/info "[a, b]: [%s %s]" a b)
     (cond
-      (and (#{:straight-flush} naive-hand-type)
-           (not= naive-hand-type :flop)
-           (not= naive-hand-type community-hand-type))
+      (and (#{:straight-flush} hand-type)
+           (not= hand-type :flop)
+           (not= hand-type community-hand-type))
       (log/spy :info :straight-flush-all-in all-in)
 
-      (and (#{:four-of-a-kind} naive-hand-type)
-           (not= naive-hand-type :flop)
+      (and (#{:four-of-a-kind} hand-type)
+           (not= hand-type :flop)
            (= a b)
-           (not= naive-hand-type community-hand-type))
+           (not= hand-type community-hand-type))
       (log/spy :info :four-of-a-kind-all-in all-in)
 
       (and (#{:straight-flush :four-of-a-kind :full-house :three-of-a-kind}
-            naive-hand-type)
-           (not= naive-hand-type :flop)
-           (not= naive-hand-type community-hand-type))
+            hand-type)
+           (not= hand-type :flop)
+           (not= hand-type community-hand-type))
       (log/spy :info :good-large-bet large-bet)
 
-      ;(and (#{:flush :straight :two-pair :pair} super-naive-hand-type)
-      (and (not= :flop naive-hand-type)
-           (not= naive-hand-type community-hand-type))
+      (and (not= :flop hand-type)
+           (not= hand-type community-hand-type))
       (log/spy :info :kinda-small-bet check-bet)
 
-      (and (> a 9) (> b 9) (= naive-hand-type :flop))
+      (and (> a 9) (> b 9) (= hand-type :flop))
       (log/spy :info :flop-large-bet check-bet)
 
-      (and (or (> a 9) (> b 9)) (= naive-hand-type :flop))
+      (and (or (> a 9) (> b 9)) (= hand-type :flop))
       (log/spy :info :flop-small-bet check-bet)
 
-      (and (= a b) (= naive-hand-type :flop))
+      (and (= a b) (= hand-type :flop))
       (log/spy :info :flop-small-pair check-bet)
 
       :else (log/spy :info :fold 0))))
