@@ -95,6 +95,7 @@
   [game-state]
   (log/info (pr-str game-state))
   (let [[a b] (map :rank (hole-cards game-state))
+        player (admiral game-state)
         small-bet (capped (small-raise game-state) game-state 2)
         large-bet (capped (* 2 small-bet) game-state 2)
         check-bet (check game-state)
@@ -127,11 +128,14 @@
       (and (> a 9) (> b 9) (= hand-type :flop))
       (log/spy :info :flop-large-bet (capped check-bet game-state 2))
 
+      (and (= hand-type :flop) (= a b))
+      (log/spy :info :flop-small-pair check-bet)
+
+      (and (= hand-type :flop) (> (:bet player) 0) (< check-bet (/ stack 2)))
+      (log/spy :info :flop-just-checking check-bet)
+
       ; (and (or (> a 9) (> b 9)) (= hand-type :flop))
       ; (log/spy :info :flop-small-bet (capped check-bet game-state 4))
-
-      (and (= a b) (= hand-type :flop))
-      (log/spy :info :flop-small-pair (capped check-bet game-state 2))
 
       :else (log/spy :info :fold 0))))
 
