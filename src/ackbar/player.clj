@@ -33,7 +33,7 @@
   [game-state]
   (log/info (pr-str game-state))
   (let [[a b] (hole-cards game-state)
-        bet (small-raise state)]
+        bet (small-raise game-state)]
     (if (and (> a 9) (> b 9))
       bet
       0)))
