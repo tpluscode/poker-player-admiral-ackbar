@@ -39,6 +39,7 @@
     (cond
       (and (> a 9) (> b 9)) (log/spy :info :large-bet large-bet)
       (or (> a 9) (> b 9)) (log/spy :info :small-bet small-bet)
+      (or (= a b)) (log/spy :info :small-bet-pair small-bet)
       :else (log/spy :info :fold 0))))
 
 (defn showdown
