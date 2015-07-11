@@ -139,7 +139,7 @@
       (log/spy :info :flop-just-checking check-bet)
 
       (and (> (:bet player) 0))
-      (log/spy :info :always-checking check-bet)
+      (log/spy :info :always-checking large-raise)
 
       :else (log/spy :info :fold 0))))
 
