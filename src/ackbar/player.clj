@@ -131,7 +131,7 @@
       (and (= hand-type :flop) (= a b))
       (log/spy :info :flop-small-pair check-bet)
 
-      (and (= hand-type :flop) (> (:bet player) 0) (< check-bet (/ stack 2)))
+      (and (= hand-type :flop) (> (:bet player) 0) (< check-bet (/ (:stack player) 2)))
       (log/spy :info :flop-just-checking check-bet)
 
       ; (and (or (> a 9) (> b 9)) (= hand-type :flop))
