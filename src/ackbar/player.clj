@@ -87,7 +87,7 @@
         stack (max (:stack p) 500)
         bet (+ value (:bet p))
         limit (/ stack ratio)]
-    (if (> bet limit)
+    (if (and (> bet limit) (< (:round state) 40))
       0
       bet)))
 
