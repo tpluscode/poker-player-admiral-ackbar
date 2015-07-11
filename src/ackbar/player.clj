@@ -3,7 +3,7 @@
    [clojure.math.combinatorics :as combo]
    [taoensso.timbre :as log]))
 
-(def version "Admiral Ackbar lives!")
+(def version "Admiral Ackbar p4wns your bot!")
 
 (defn admiral [state]
   (-> state
