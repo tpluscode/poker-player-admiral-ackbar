@@ -96,11 +96,11 @@
       (and (> a 9) (> b 9) (= naive-hand-type :flop))
       (log/spy :info :flop-large-bet small-bet)
 
-      (or (> a 9) (> b 9) (= naive-hand-type :flop))
+      (and (or (> a 9) (> b 9)) (= naive-hand-type :flop))
       (log/spy :info :flop-small-bet check-bet)
 
-      (or (= a b) (= naive-hand-type :flop))
-      (log/spy :info :flop-small-pair small-bet)
+      (and (= a b) (= naive-hand-type :flop))
+      (log/spy :info :flop-small-pair check-bet)
 
       :else (log/spy :info :fold 0))))
 
