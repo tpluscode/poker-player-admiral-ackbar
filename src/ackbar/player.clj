@@ -69,7 +69,6 @@
       0
       bet)))
 
-
 (defn bet-request
   [game-state]
   (log/info (pr-str game-state))
@@ -102,7 +101,7 @@
       (log/spy :info :good-large-bet large-bet)
 
       ;(and (#{:flush :straight :two-pair :pair} super-naive-hand-type)
-      (and (not= :flop super-naive-hand-type)
+      (and (not= :flop naive-hand-type)
            (not= naive-hand-type community-hand-type))
       (log/spy :info :kinda-small-bet check-bet)
 
