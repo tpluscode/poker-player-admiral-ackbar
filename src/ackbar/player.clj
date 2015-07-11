@@ -66,7 +66,7 @@
   (let [[a b] (map :rank (hole-cards game-state))
         small-bet (small-raise game-state)
         large-bet (* 2 small-bet)
-        check-bet (check state)
+        check-bet (check game-state)
         naive-hand-type (eval-hand (take 5 (concat (hole-cards game-state)
                                                    (community-cards game-state))))
         super-naive-hand-type (eval-hand (concat (hole-cards game-state)
