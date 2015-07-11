@@ -87,9 +87,10 @@
         stack (max (:stack p) 500)
         bet (+ value (:bet p))
         limit (/ stack ratio)]
-    (if (and (> bet limit) (or (< (:round state) 40) (> (count (:players state)) 3)))
-      0
-      bet)))
+    bet))
+    ; (if (and (> bet limit) (or (< (:round state) 40) (> (count (:players state)) 3)))
+    ;   0
+    ;   bet)))
 
 (defn bet-request
   [game-state]
